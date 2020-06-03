@@ -24,7 +24,13 @@ import {
   DEFAULT_INTERVAL_VALUE,
 } from '../../../common/constants';
 import { networkModel } from '../../network/store';
-import { TimelineType } from '../../../common/types/timeline';
+import { TimelineType, TimelineStatus } from '../../../common/types/timeline';
+import { initialAlertListState } from '../../endpoint_alerts/store/reducer';
+import { initialHostListState } from '../../endpoint_hosts/store/reducer';
+import { mockManagementState } from '../../management/store/reducer';
+import { AlertListState } from '../../../common/endpoint_alerts/types';
+import { HostState } from '../../endpoint_hosts/types';
+import { ManagementState } from '../../management/types';
 
 export const mockGlobalState: State = {
   app: {
@@ -222,7 +228,15 @@ export const mockGlobalState: State = {
         width: DEFAULT_TIMELINE_WIDTH,
         isSaving: false,
         version: null,
+        status: TimelineStatus.active,
       },
     },
   },
+  /**
+   * These state's are wrapped in `Immutable`, but for compatibility with the overall app architecture,
+   * they are cast to mutable versions here.
+   */
+  alertList: initialAlertListState as AlertListState,
+  hostList: initialHostListState as HostState,
+  management: mockManagementState as ManagementState,
 };

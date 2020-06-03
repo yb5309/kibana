@@ -42,6 +42,10 @@ export { kbnTestConfig, kibanaServerTestUser, kibanaTestUser, adminTestUser } fr
 // @ts-ignore not typed yet
 export { setupUsers, DEFAULT_SUPERUSER_PASS } from './functional_tests/lib/auth';
 
+export { readConfigFile } from './functional_test_runner/lib/config/read_config_file';
+
+export { runFtrCli } from './functional_test_runner/cli';
+
 export {
   createAutoJUnitReporter,
   runMochaCli,

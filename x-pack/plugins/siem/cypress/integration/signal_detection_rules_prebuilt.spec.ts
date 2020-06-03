@@ -10,7 +10,7 @@ import {
   RELOAD_PREBUILT_RULES_BTN,
   RULES_ROW,
   RULES_TABLE,
-} from '../screens/signal_detection_rules';
+} from '../screens/alert_detection_rules';
 
 import {
   changeToThreeHundredRowsPerPage,
@@ -22,11 +22,11 @@ import {
   waitForLoadElasticPrebuiltDetectionRulesTableToBeLoaded,
   waitForPrebuiltDetectionRulesToBeLoaded,
   waitForRulesToBeLoaded,
-} from '../tasks/signal_detection_rules';
+} from '../tasks/alert_detection_rules';
 import {
-  goToManageSignalDetectionRules,
-  waitForSignalsIndexToBeCreated,
-  waitForSignalsPanelToBeLoaded,
+  goToManageAlertDetectionRules,
+  waitForAlertsIndexToBeCreated,
+  waitForAlertsPanelToBeLoaded,
 } from '../tasks/detections';
 import { esArchiverLoadEmptyKibana, esArchiverUnloadEmptyKibana } from '../tasks/es_archiver';
 import { loginAndWaitForPageWithoutDateRange } from '../tasks/login';
@@ -35,7 +35,7 @@ import { DETECTIONS } from '../urls/navigation';
 
 import { totalNumberOfPrebuiltRules } from '../objects/rule';
 
-describe('Signal detection rules, prebuilt rules', () => {
+describe('Detection rules, prebuilt rules', () => {
   before(() => {
     esArchiverLoadEmptyKibana();
   });
@@ -49,21 +49,19 @@ describe('Signal detection rules, prebuilt rules', () => {
     const expectedElasticRulesBtnText = `Elastic rules (${expectedNumberOfRules})`;
 
     loginAndWaitForPageWithoutDateRange(DETECTIONS);
-    waitForSignalsPanelToBeLoaded();
-    waitForSignalsIndexToBeCreated();
-    goToManageSignalDetectionRules();
+    waitForAlertsPanelToBeLoaded();
+    waitForAlertsIndexToBeCreated();
+    goToManageAlertDetectionRules();
     waitForLoadElasticPrebuiltDetectionRulesTableToBeLoaded();
     loadPrebuiltDetectionRules();
     waitForPrebuiltDetectionRulesToBeLoaded();
 
-    cy.get(ELASTIC_RULES_BTN)
-      .invoke('text')
-      .should('eql', expectedElasticRulesBtnText);
+    cy.get(ELASTIC_RULES_BTN).invoke('text').should('eql', expectedElasticRulesBtnText);
 
     changeToThreeHundredRowsPerPage();
     waitForRulesToBeLoaded();
 
-    cy.get(RULES_TABLE).then($table => {
+    cy.get(RULES_TABLE).then(($table) => {
       cy.wrap($table.find(RULES_ROW).length).should('eql', expectedNumberOfRules);
     });
   });
@@ -76,21 +74,19 @@ describe('Deleting prebuilt rules', () => {
 
     esArchiverLoadEmptyKibana();
     loginAndWaitForPageWithoutDateRange(DETECTIONS);
-    waitForSignalsPanelToBeLoaded();
-    waitForSignalsIndexToBeCreated();
-    goToManageSignalDetectionRules();
+    waitForAlertsPanelToBeLoaded();
+    waitForAlertsIndexToBeCreated();
+    goToManageAlertDetectionRules();
     waitForLoadElasticPrebuiltDetectionRulesTableToBeLoaded();
     loadPrebuiltDetectionRules();
     waitForPrebuiltDetectionRulesToBeLoaded();
 
-    cy.get(ELASTIC_RULES_BTN)
-      .invoke('text')
-      .should('eql', expectedElasticRulesBtnText);
+    cy.get(ELASTIC_RULES_BTN).invoke('text').should('eql', expectedElasticRulesBtnText);
 
     changeToThreeHundredRowsPerPage();
     waitForRulesToBeLoaded();
 
-    cy.get(RULES_TABLE).then($table => {
+    cy.get(RULES_TABLE).then(($table) => {
       cy.wrap($table.find(RULES_ROW).length).should('eql', expectedNumberOfRules);
     });
   });
@@ -103,7 +99,7 @@ describe('Deleting prebuilt rules', () => {
     const numberOfRulesToBeSelected = 2;
     selectNumberOfRules(numberOfRulesToBeSelected);
 
-    cy.get(COLLAPSED_ACTION_BTN).each(collapsedItemActionBtn => {
+    cy.get(COLLAPSED_ACTION_BTN).each((collapsedItemActionBtn) => {
       cy.wrap(collapsedItemActionBtn).should('have.attr', 'disabled');
     });
   });
@@ -120,7 +116,7 @@ describe('Deleting prebuilt rules', () => {
     cy.get(ELASTIC_RULES_BTN)
       .invoke('text')
       .should('eql', `Elastic rules (${expectedNumberOfRulesAfterDeletion})`);
-    cy.get(RULES_TABLE).then($table => {
+    cy.get(RULES_TABLE).then(($table) => {
       cy.wrap($table.find(RULES_ROW).length).should('eql', expectedNumberOfRulesAfterDeletion);
     });
     cy.get(RELOAD_PREBUILT_RULES_BTN).should('exist');
@@ -136,7 +132,7 @@ describe('Deleting prebuilt rules', () => {
     changeToThreeHundredRowsPerPage();
     waitForRulesToBeLoaded();
 
-    cy.get(RULES_TABLE).then($table => {
+    cy.get(RULES_TABLE).then(($table) => {
       cy.wrap($table.find(RULES_ROW).length).should('eql', expectedNumberOfRulesAfterRecovering);
     });
     cy.get(ELASTIC_RULES_BTN)
@@ -162,7 +158,7 @@ describe('Deleting prebuilt rules', () => {
     cy.get(ELASTIC_RULES_BTN)
       .invoke('text')
       .should('eql', `Elastic rules (${expectedNumberOfRulesAfterDeletion})`);
-    cy.get(RULES_TABLE).then($table => {
+    cy.get(RULES_TABLE).then(($table) => {
       cy.wrap($table.find(RULES_ROW).length).should('eql', expectedNumberOfRulesAfterDeletion);
     });
 
@@ -174,7 +170,7 @@ describe('Deleting prebuilt rules', () => {
     changeToThreeHundredRowsPerPage();
     waitForRulesToBeLoaded();
 
-    cy.get(RULES_TABLE).then($table => {
+    cy.get(RULES_TABLE).then(($table) => {
       cy.wrap($table.find(RULES_ROW).length).should('eql', expectedNumberOfRulesAfterRecovering);
     });
     cy.get(ELASTIC_RULES_BTN)

@@ -4,7 +4,16 @@
  * you may not use this file except in compliance with the Elastic License.
  */
 
-import { Action, applyMiddleware, compose, createStore as createReduxStore, Store } from 'redux';
+import {
+  Action,
+  applyMiddleware,
+  compose,
+  createStore as createReduxStore,
+  Store,
+  Middleware,
+  Dispatch,
+  PreloadedState,
+} from 'redux';
 
 import { createEpicMiddleware } from 'redux-observable';
 import { Observable } from 'rxjs';
@@ -13,9 +22,12 @@ import { telemetryMiddleware } from '../lib/telemetry';
 import { appSelectors } from './app';
 import { timelineSelectors } from '../../timelines/store/timeline';
 import { inputsSelectors } from './inputs';
-import { State, SubPluginsInitReducer, createReducer } from './reducer';
+import { SubPluginsInitReducer, createReducer } from './reducer';
 import { createRootEpic } from './epic';
 import { AppApolloClient } from '../lib/lib';
+import { AppAction } from './actions';
+import { Immutable } from '../../../common/endpoint/types';
+import { State } from './types';
 
 type ComposeType = typeof compose;
 declare global {
@@ -23,12 +35,20 @@ declare global {
     __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: ComposeType;
   }
 }
+/**
+ * The Redux store type for the Security app.
+ */
+export type SecurityAppStore = Store<State, Action>;
 let store: Store<State, Action> | null = null;
-export { SubPluginsInitReducer };
+
+/**
+ * Factory for Security App's redux store.
+ */
 export const createStore = (
-  state: State,
+  state: PreloadedState<State>,
   pluginsReducer: SubPluginsInitReducer,
-  apolloClient: Observable<AppApolloClient>
+  apolloClient: Observable<AppApolloClient>,
+  additionalMiddleware?: Array<Middleware<{}, State, Dispatch<AppAction | Immutable<AppAction>>>>
 ): Store<State, Action> => {
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
@@ -49,7 +69,9 @@ export const createStore = (
   store = createReduxStore(
     createReducer(pluginsReducer),
     state,
-    composeEnhancers(applyMiddleware(epicMiddleware, telemetryMiddleware))
+    composeEnhancers(
+      applyMiddleware(epicMiddleware, telemetryMiddleware, ...(additionalMiddleware ?? []))
+    )
   );
 
   epicMiddleware.run(createRootEpic<State>());

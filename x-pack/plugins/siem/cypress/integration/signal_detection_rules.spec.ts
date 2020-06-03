@@ -10,12 +10,12 @@ import {
   RULE_SWITCH,
   SECOND_RULE,
   SEVENTH_RULE,
-} from '../screens/signal_detection_rules';
+} from '../screens/alert_detection_rules';
 
 import {
-  goToManageSignalDetectionRules,
-  waitForSignalsPanelToBeLoaded,
-  waitForSignalsIndexToBeCreated,
+  goToManageAlertDetectionRules,
+  waitForAlertsPanelToBeLoaded,
+  waitForAlertsIndexToBeCreated,
 } from '../tasks/detections';
 import { esArchiverLoad, esArchiverUnload } from '../tasks/es_archiver';
 import { loginAndWaitForPageWithoutDateRange } from '../tasks/login';
@@ -24,11 +24,11 @@ import {
   sortByActivatedRules,
   waitForLoadElasticPrebuiltDetectionRulesTableToBeLoaded,
   waitForRuleToBeActivated,
-} from '../tasks/signal_detection_rules';
+} from '../tasks/alert_detection_rules';
 
 import { DETECTIONS } from '../urls/navigation';
 
-describe('Signal detection rules', () => {
+describe('Detection rules', () => {
   before(() => {
     esArchiverLoad('prebuilt_rules_loaded');
   });
@@ -39,20 +39,20 @@ describe('Signal detection rules', () => {
 
   it('Sorts by activated rules', () => {
     loginAndWaitForPageWithoutDateRange(DETECTIONS);
-    waitForSignalsPanelToBeLoaded();
-    waitForSignalsIndexToBeCreated();
-    goToManageSignalDetectionRules();
+    waitForAlertsPanelToBeLoaded();
+    waitForAlertsIndexToBeCreated();
+    goToManageAlertDetectionRules();
     waitForLoadElasticPrebuiltDetectionRulesTableToBeLoaded();
     cy.get(RULE_NAME)
       .eq(FIFTH_RULE)
       .invoke('text')
-      .then(fifthRuleName => {
+      .then((fifthRuleName) => {
         activateRule(FIFTH_RULE);
         waitForRuleToBeActivated();
         cy.get(RULE_NAME)
           .eq(SEVENTH_RULE)
           .invoke('text')
-          .then(seventhRuleName => {
+          .then((seventhRuleName) => {
             activateRule(SEVENTH_RULE);
             waitForRuleToBeActivated();
             sortByActivatedRules();
@@ -60,23 +60,19 @@ describe('Signal detection rules', () => {
             cy.get(RULE_NAME)
               .eq(FIRST_RULE)
               .invoke('text')
-              .then(firstRuleName => {
+              .then((firstRuleName) => {
                 cy.get(RULE_NAME)
                   .eq(SECOND_RULE)
                   .invoke('text')
-                  .then(secondRuleName => {
+                  .then((secondRuleName) => {
                     const expectedRulesNames = `${firstRuleName} ${secondRuleName}`;
                     cy.wrap(expectedRulesNames).should('include', fifthRuleName);
                     cy.wrap(expectedRulesNames).should('include', seventhRuleName);
                   });
               });
 
-            cy.get(RULE_SWITCH)
-              .eq(FIRST_RULE)
-              .should('have.attr', 'role', 'switch');
-            cy.get(RULE_SWITCH)
-              .eq(SECOND_RULE)
-              .should('have.attr', 'role', 'switch');
+            cy.get(RULE_SWITCH).eq(FIRST_RULE).should('have.attr', 'role', 'switch');
+            cy.get(RULE_SWITCH).eq(SECOND_RULE).should('have.attr', 'role', 'switch');
           });
       });
   });

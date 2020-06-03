@@ -4,12 +4,20 @@
  * you may not use this file except in compliance with the Elastic License.
  */
 
-import { Reducer, AnyAction } from 'redux';
+import {
+  Reducer,
+  AnyAction,
+  Middleware,
+  Dispatch,
+  PreloadedState,
+  StateFromReducersMapObject,
+  CombinedState,
+} from 'redux';
 
 import { NavTab } from '../common/components/navigation/types';
-import { HostsState } from '../hosts/store';
-import { NetworkState } from '../network/store';
-import { TimelineState } from '../timelines/store/timeline/types';
+import { State, SubPluginsInitReducer } from '../common/store';
+import { Immutable } from '../../common/endpoint/types';
+import { AppAction } from '../common/store/actions';
 
 export enum SiemPageName {
   overview = 'overview',
@@ -18,6 +26,7 @@ export enum SiemPageName {
   detections = 'detections',
   timelines = 'timelines',
   case = 'case',
+  management = 'management',
 }
 
 export type SiemNavTabKey =
@@ -26,20 +35,32 @@ export type SiemNavTabKey =
   | SiemPageName.network
   | SiemPageName.detections
   | SiemPageName.timelines
-  | SiemPageName.case;
+  | SiemPageName.case
+  | SiemPageName.management;
 
 export type SiemNavTab = Record<SiemNavTabKey, NavTab>;
 
 export interface SecuritySubPluginStore<K extends SecuritySubPluginKeyStore, T> {
-  initialState: Record<K, T>;
+  initialState: Record<K, T | undefined>;
   reducer: Record<K, Reducer<T, AnyAction>>;
+  middleware?: Array<Middleware<{}, State, Dispatch<AppAction | Immutable<AppAction>>>>;
 }
 
 export interface SecuritySubPlugin {
   routes: React.ReactElement[];
 }
 
-type SecuritySubPluginKeyStore = 'hosts' | 'network' | 'timeline';
+type SecuritySubPluginKeyStore =
+  | 'hosts'
+  | 'network'
+  | 'timeline'
+  | 'hostList'
+  | 'alertList'
+  | 'management';
+
+/**
+ * Returned by the various 'SecuritySubPlugin' classes from the `start` method.
+ */
 export interface SecuritySubPluginWithStore<K extends SecuritySubPluginKeyStore, T>
   extends SecuritySubPlugin {
   store: SecuritySubPluginStore<K, T>;
@@ -47,15 +68,17 @@ export interface SecuritySubPluginWithStore<K extends SecuritySubPluginKeyStore,
 
 export interface SecuritySubPlugins extends SecuritySubPlugin {
   store: {
-    initialState: {
-      hosts: HostsState;
-      network: NetworkState;
-      timeline: TimelineState;
-    };
-    reducer: {
-      hosts: Reducer<HostsState, AnyAction>;
-      network: Reducer<NetworkState, AnyAction>;
-      timeline: Reducer<TimelineState, AnyAction>;
-    };
+    initialState: PreloadedState<
+      CombinedState<
+        StateFromReducersMapObject<
+          /** SubPluginsInitReducer, being an interface, will not work in `StateFromReducersMapObject`.
+           * Picking its keys does the trick.
+           **/
+          Pick<SubPluginsInitReducer, keyof SubPluginsInitReducer>
+        >
+      >
+    >;
+    reducer: SubPluginsInitReducer;
+    middlewares: Array<Middleware<{}, State, Dispatch<AppAction | Immutable<AppAction>>>>;
   };
 }

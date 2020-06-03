@@ -6,16 +6,19 @@
 
 import { Filter } from '../../../../../../../src/plugins/data/public';
 
-import { TimelineTypeLiteralWithNull } from '../../../../common/types/timeline';
-
 import { DataProvider } from '../../components/timeline/data_providers/data_provider';
 import { Sort } from '../../components/timeline/body/sort';
-import { PinnedEvent, TimelineNonEcsData } from '../../../graphql/types';
-import { KueryFilterQuery, SerializedFilterQuery } from '../../../common/store/model';
+import {
+  PinnedEvent,
+  TimelineNonEcsData,
+  TimelineType,
+  TimelineStatus,
+} from '../../../graphql/types';
+import { KueryFilterQuery, SerializedFilterQuery } from '../../../common/store/types';
 
 export const DEFAULT_PAGE_COUNT = 2; // Eui Pager will not render unless this is a minimum of 2 pages
 export type KqlMode = 'filter' | 'search';
-export type EventType = 'all' | 'raw' | 'signal';
+export type EventType = 'all' | 'raw' | 'alert';
 
 export type ColumnHeaderType = 'not-filtered' | 'text-filter';
 
@@ -81,7 +84,7 @@ export interface TimelineModel {
   /** Title */
   title: string;
   /** timelineType: default | template */
-  timelineType: TimelineTypeLiteralWithNull;
+  timelineType: TimelineType;
   /** an unique id for template timeline */
   templateTimelineId: string | null;
   /** null for default timeline, number for template timeline */
@@ -107,6 +110,8 @@ export interface TimelineModel {
   showRowRenderers: boolean;
   /**  Specifies which column the timeline is sorted on, and the direction (ascending / descending) */
   sort: Sort;
+  /** status: active | draft */
+  status: TimelineStatus;
   /** Persists the UI state (width) of the timeline flyover */
   width: number;
   /** timeline is saving */
@@ -153,6 +158,7 @@ export type SubsetTimelineModel = Readonly<
     | 'savedObjectId'
     | 'version'
     | 'timelineType'
+    | 'status'
   >
 >;
 

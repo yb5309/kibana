@@ -118,22 +118,14 @@ describe('TopN', () => {
     });
 
     test('it invokes the toggleTopN function when the close button is clicked', () => {
-      wrapper
-        .find('[data-test-subj="close"]')
-        .first()
-        .simulate('click');
+      wrapper.find('[data-test-subj="close"]').first().simulate('click');
       wrapper.update();
 
       expect(toggleTopN).toHaveBeenCalled();
     });
 
     test('it enables the view select by default', () => {
-      expect(
-        wrapper
-          .find('[data-test-subj="view-select"]')
-          .first()
-          .props().disabled
-      ).toBe(false);
+      expect(wrapper.find('[data-test-subj="view-select"]').first().props().disabled).toBe(false);
     });
   });
 
@@ -171,11 +163,11 @@ describe('TopN', () => {
     });
 
     test(`it does NOT render SignalsByCategory when defaultView is 'raw'`, () => {
-      expect(wrapper.find('[data-test-subj="signals-histogram-panel"]').exists()).toBe(false);
+      expect(wrapper.find('[data-test-subj="alerts-histogram-panel"]').exists()).toBe(false);
     });
   });
 
-  describe('signals view', () => {
+  describe('alerts view', () => {
     let toggleTopN: () => void;
     let wrapper: ReactWrapper;
 
@@ -184,7 +176,7 @@ describe('TopN', () => {
       wrapper = mount(
         <TestProviders>
           <TopN
-            defaultView="signal"
+            defaultView="alert"
             field={field}
             filters={[]}
             from={1586824307695}
@@ -203,7 +195,7 @@ describe('TopN', () => {
     });
 
     test(`it renders SignalsByCategory when defaultView is 'signal'`, () => {
-      expect(wrapper.find('[data-test-subj="signals-histogram-panel"]').exists()).toBe(true);
+      expect(wrapper.find('[data-test-subj="alerts-histogram-panel"]').exists()).toBe(true);
     });
 
     test(`it does NOT render EventsByDataset when defaultView is 'signal'`, () => {
@@ -240,12 +232,7 @@ describe('TopN', () => {
     });
 
     test(`it disables the view select when 'options' contains only one entry`, () => {
-      expect(
-        wrapper
-          .find('[data-test-subj="view-select"]')
-          .first()
-          .props().disabled
-      ).toBe(true);
+      expect(wrapper.find('[data-test-subj="view-select"]').first().props().disabled).toBe(true);
     });
 
     test(`it renders EventsByDataset when defaultView is 'all'`, () => {
@@ -255,7 +242,7 @@ describe('TopN', () => {
     });
 
     test(`it does NOT render SignalsByCategory when defaultView is 'all'`, () => {
-      expect(wrapper.find('[data-test-subj="signals-histogram-panel"]').exists()).toBe(false);
+      expect(wrapper.find('[data-test-subj="alerts-histogram-panel"]').exists()).toBe(false);
     });
   });
 });
